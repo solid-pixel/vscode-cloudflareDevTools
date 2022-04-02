@@ -1,172 +1,194 @@
 
-const vscode = require( 'vscode' )
-const DataProvider = require( './src/dataProvider.js' )
+const vscode = require( 'vscode' );
+const DataProvider = require( './src/dataProvider.js' );
 
 /**
  * @param {vscode.ExtensionContext} context
  */
 
 
-const statusBar = vscode.window.createStatusBarItem( vscode.StatusBarAlignment.Right )
-const config = vscode.workspace.getConfiguration( 'cloudflareDevTools' )
-const https = require( 'https' )
-let interval
+const statusBar = vscode.window.createStatusBarItem( vscode.StatusBarAlignment.Right );
+const config = vscode.workspace.getConfiguration( 'cloudflareDevTools' );
+const https = require( 'https' );
 
-// Config Variables
-let AUTH_KEY = config.api.key
-let AUTH_EMAIL = config.api.email
-let ZONE_ID = config.api.zoneID
-let purgeCacheAutomatically = config.cache.purgeAutomatically
-let checkStatusEnable = config.developmentModeStatus.enable
-let checkStatusInterval = config.developmentModeStatus.interval
+let interval;
 
-const host = 'api.cloudflare.com'
-const port = '443'
-let path = '/client/v4/zones/' + ZONE_ID
+/* Config Variables */
+let AUTH_KEY = config.api.key;
+let AUTH_EMAIL = config.api.email;
+let ZONE_ID = config.api.zoneID;
+let purgeCacheAutomatically = config.cache.purgeAutomatically;
+let checkStatusEnable = config.developmentModeStatus.enable;
+let checkStatusInterval = config.developmentModeStatus.interval;
+const host = 'api.cloudflare.com';
+const port = '443';
+let path = '/client/v4/zones/' + ZONE_ID;
 
 // const colorOn = new vscode.ThemeColor("activityBarBadge.background");
-const colorOff = new vscode.ThemeColor( "statusBar.foreground" )
+const colorOff = new vscode.ThemeColor( 'statusBar.foreground' );
 
-
-
-// Output Log
-let outputCheck = vscode.window.createOutputChannel( "Cloudflare DevTools | Status Check" )
-let outputLogs = vscode.window.createOutputChannel( "Cloudflare DevTools | Logs" )
-
+/* Output Log */
+const outputCheck = vscode.window.createOutputChannel( 'Cloudflare DevTools | Status Check' );
+const outputLogs = vscode.window.createOutputChannel( 'Cloudflare DevTools | Logs' );
 
 function activate( context ) {
 
-	// Listen to config changes
-	configChanged()
+	/* Listen to config changes */
+	configChanged();
 
-	// Commands
-	let devOn = vscode.commands.registerCommand( 'cloudflareDevTools.devOn', () => {
-		devModeSwitch( 'on' )
-	} )
+	/* Commands */
+	const devOn = vscode.commands.registerCommand( 'cloudflareDevTools.devOn',() => {
 
-	let devOff = vscode.commands.registerCommand( 'cloudflareDevTools.devOff', () => {
-		devModeSwitch( 'off' )
-	} )
+		devModeSwitch( 'on' );
 
-	let purgeCache = vscode.commands.registerCommand( 'cloudflareDevTools.purgeCache', () => {
-		purgeCacheFn()
-	} )
+	} );
 
-	let commands = vscode.commands.registerCommand( 'cloudflareDevTools.commands', () => {
-		vscode.commands.executeCommand( "workbench.action.quickOpen", ">Cloudflare DevTools:" )
-	} )
+	const devOff = vscode.commands.registerCommand( 'cloudflareDevTools.devOff', () => {
 
+		devModeSwitch( 'off' );
 
-	// Tree Data Provider
-	let myData = new DataProvider()
-	let view = vscode.window.createTreeView( "cloudflareDevTools-tree", {
+	} );
+
+	const purgeCache = vscode.commands.registerCommand( 'cloudflareDevTools.purgeCache', () => {
+
+		purgeCacheFn();
+
+	} );
+
+	const commands = vscode.commands.registerCommand( 'cloudflareDevTools.commands', () => {
+
+		vscode.commands.executeCommand( 'workbench.action.quickOpen', '>Cloudflare DevTools:' );
+
+	} );
+
+	/* Tree Data Provider */
+	const myData = new DataProvider();
+	const view = vscode.window.createTreeView( 'cloudflareDevTools-tree', {
 		treeDataProvider: myData,
-	} )
+	} );
 
-
-	// Check Status
+	/* Check Status */
 	if ( AUTH_KEY && AUTH_EMAIL && ZONE_ID ) {
+
 		if ( checkStatusEnable == true ) {
-			checkStatus()
+
+			checkStatus();
+
 		}
+
 	}
 
-	// Status Bar
-	statusBarFn()
+	/* Status Bar */
+	statusBarFn();
 
-
-	// Subscriptions
-	context.subscriptions.push( devOn )
-	context.subscriptions.push( devOff )
-	context.subscriptions.push( purgeCache )
-	context.subscriptions.push( commands )
-	context.subscriptions.push( view )
-	context.subscriptions.push( statusBar )
+	/* Subscriptions */
+	context.subscriptions.push( devOn );
+	context.subscriptions.push( devOff );
+	context.subscriptions.push( purgeCache );
+	context.subscriptions.push( commands );
+	context.subscriptions.push( view );
+	context.subscriptions.push( statusBar );
 
 } // activate()
 
-
-// Listen for config changes
+/* Listen for config changes */
 function configChanged() {
 
-	vscode.workspace.onDidChangeConfiguration( function ( e ) {
+	vscode.workspace.onDidChangeConfiguration( ( e ) => {
 
 		if ( e.affectsConfiguration( 'cloudflareDevTools' ) ) {
 
-			let config = vscode.workspace.getConfiguration( 'cloudflareDevTools' )
-			AUTH_KEY = config.api.key
-			AUTH_EMAIL = config.api.email
-			ZONE_ID = config.api.zoneID
-			path = '/client/v4/zones/' + ZONE_ID
-			purgeCacheAutomatically = config.cache.purgeAutomatically
-			checkStatusEnable = config.developmentModeStatus.enable
-			checkStatusInterval = config.developmentModeStatus.interval
+			const config = vscode.workspace.getConfiguration( 'cloudflareDevTools' );
+
+			AUTH_KEY = config.api.key;
+			AUTH_EMAIL = config.api.email;
+			ZONE_ID = config.api.zoneID;
+			path = '/client/v4/zones/' + ZONE_ID;
+			purgeCacheAutomatically = config.cache.purgeAutomatically;
+			checkStatusEnable = config.developmentModeStatus.enable;
+			checkStatusInterval = config.developmentModeStatus.interval;
 
 			if ( checkStatusEnable == true ) {
-				checkStatus()
+
+				checkStatus();
+
 			} else {
-				clearInterval( interval )
-				statusBarOff()
-				outputCheck.replace( 'Periodic check has been disabled.' )
+
+				clearInterval( interval );
+				statusBarOff();
+				outputCheck.replace( 'Periodic check has been disabled.' );
+
 			}
 
-			checkStatus()
+			checkStatus();
 
 		}
 
 
-
-	} )
+	} );
 
 }
 
 
-// Status Bar Defaults
+/* Status Bar Defaults */
 function statusBarFn() {
-	statusBar.text = '$(cloud)'
-	statusBar.tooltip = 'Cloudflare DevTools'
-	statusBar.command = 'cloudflareDevTools.commands'
-	statusBar.show()
+
+	statusBar.text = '$(cloud)';
+	statusBar.tooltip = 'Cloudflare DevTools';
+	statusBar.command = 'cloudflareDevTools.commands';
+	statusBar.show();
+
 }
 
 
-// Status Bar On
-function statusBarOn( time_remaining ) {
-	let timeLeft = Math.floor( time_remaining / 60 )
+/* Status Bar On */
+function statusBarOn( timeRemaining ) {
+
+	const timeLeft = Math.floor( timeRemaining / 60 );
+
 	// statusBar.color = colorOn;
-	statusBar.tooltip = `Cloudflare Development Mode: ON (${timeLeft} minutes left)`
-	statusBar.text = '$(cloud)'
-	statusBar.backgroundColor = new vscode.ThemeColor( 'statusBarItem.warningBackground' )
+	statusBar.tooltip = `Cloudflare Development Mode: ON (${ timeLeft } minutes left)`;
+	statusBar.text = '$(cloud)';
+	statusBar.backgroundColor = new vscode.ThemeColor( 'statusBarItem.warningBackground' );
+
 }
 
 
-// Status Bar Off
+/* Status Bar Off */
 function statusBarOff() {
-	statusBar.color = colorOff
-	statusBar.text = '$(cloud)'
-	statusBar.tooltip = 'Cloudflare DevTools'
-	statusBar.backgroundColor = null
+
+	statusBar.color = colorOff;
+	statusBar.text = '$(cloud)';
+	statusBar.tooltip = 'Cloudflare DevTools';
+	statusBar.backgroundColor = null;
+
 }
 
 
-// Status Bar Error
+/* Status Bar Error */
 function statusBarError() {
-	statusBar.color = colorOff
-	statusBar.text = '$(cloud)'
-	statusBar.tooltip = 'Couldn\'t ping the API, please check your settings.'
-	statusBar.backgroundColor = new vscode.ThemeColor( 'statusBarItem.errorBackground' )
+
+	statusBar.color = colorOff;
+	statusBar.text = '$(cloud)';
+	statusBar.tooltip = 'Couldn\'t ping the API, please check your settings.';
+	statusBar.backgroundColor = new vscode.ThemeColor( 'statusBarItem.errorBackground' );
+
 }
 
 
-// Development Mode 
-function devModeStatusCallback( value, time_remaining ) {
+/* Development Mode */
+function devModeStatusCallback( value, timeRemaining ) {
 
 	if ( checkStatusEnable == true ) {
 
 		if ( value == 'on' ) {
-			statusBarOn( time_remaining )
+
+			statusBarOn( timeRemaining );
+
 		} else {
-			statusBarOff()
+
+			statusBarOff();
+
 		}
 
 	}
@@ -175,12 +197,12 @@ function devModeStatusCallback( value, time_remaining ) {
 }
 
 
-// Switch Dev Mode ON/OFF
+/* Switch Dev Mode ON/OFF */
 function devModeSwitch( value ) {
 
 	const postData = JSON.stringify( {
 		'value': value
-	} )
+	} );
 
 	const options = {
 		host: host,
@@ -192,67 +214,77 @@ function devModeSwitch( value ) {
 			'X-Auth-Key': AUTH_KEY,
 			'Content-Type': 'application/json'
 		}
-	}
+	};
 
-	const req = https.request( options, function ( res ) {
+	const req = https.request( options, ( res ) => {
 
 		// console.log(res.statusCode);
-		let current = new Date()
+		const current = new Date();
+		let body = '';
 
-		var body = ''
-		res.on( 'data', function ( chunk ) {
-			body += chunk
-		} )
+		res.on( 'data', ( chunk ) => {
+
+			body += chunk;
+
+		} );
 
 		res.on( 'end', () => {
 
-			body = JSON.parse( body )
+			body = JSON.parse( body );
 			// console.log(body);
 
 			if ( res.statusCode !== 200 ) {
+
 				body.errors.forEach( e => {
-					vscode.window.showErrorMessage( `${e.message} (${res.statusCode})` )
-					outputLogs.appendLine( `[${current.toLocaleTimeString()}] [Development Mode] Error: ${e.message} (${res.statusCode})` )
-				} )
+
+					vscode.window.showErrorMessage( `${ e.message } (${ res.statusCode })` );
+					outputLogs.appendLine( `[${ current.toLocaleTimeString() }] [Development Mode] Error: ${ e.message } (${ res.statusCode })` );
+
+				} );
+
 			} else {
 
-				vscode.window.showInformationMessage( `Cloudflare Development Mode is now ${value.toUpperCase()}.` )
-
-				outputLogs.appendLine( `[${current.toLocaleTimeString()}] Development Mode has been turned ${body.result.value.toUpperCase()}` )
-
-				devModeStatusCallback( body.result.value )
+				vscode.window.showInformationMessage( `Cloudflare Development Mode is now ${ value.toUpperCase() }.` );
+				outputLogs.appendLine( `[${ current.toLocaleTimeString() }] Development Mode has been turned ${ body.result.value.toUpperCase() }` );
+				devModeStatusCallback( body.result.value );
 
 				if ( purgeCacheAutomatically == true ) {
-					purgeCacheFn()
+
+					purgeCacheFn();
+
 				}
+
 			}
 
-		} )
+		} );
 
-	} )
+	} );
 
-	req.on( 'error', function ( e ) {
-		vscode.window.showErrorMessage( e.message )
-		outputLogs.appendLine( `[${current.toLocaleTimeString()}] Error: ${e.message}` )
-	} )
+	req.on( 'error', ( e ) => {
 
-	req.write( postData )
+		const current = new Date();
 
-	req.end()
+		vscode.window.showErrorMessage( e.message );
+		outputLogs.appendLine( `[${ current.toLocaleTimeString() }] Error: ${ e.message }` );
+
+	} );
+
+	req.write( postData );
+
+	req.end();
 
 }
 
 
-// Check if Dev Mode is ON/OFF
+/* Check if Dev Mode is ON/OFF */
 function devModeCheck() {
 
-	const config = vscode.workspace.getConfiguration( 'cloudflareDevTools' )
-	const https = require( 'https' )
-	let interval
+	const config = vscode.workspace.getConfiguration( 'cloudflareDevTools' );
+	const https = require( 'https' );
 
-	// Config Variables
-	let AUTH_KEY = config.api.key
-	let AUTH_EMAIL = config.api.email
+	/* Config Variables */
+	const AUTH_KEY = config.api.key;
+	const AUTH_EMAIL = config.api.email;
 
 	const options = {
 		host: host,
@@ -264,52 +296,64 @@ function devModeCheck() {
 			'X-Auth-Key': AUTH_KEY,
 			'Content-Type': 'application/json'
 		}
-	}
+	};
 
-	const req = https.request( options, function ( res ) {
+	const req = https.request( options, ( res ) => {
 
-		var body = ''
-		let current = new Date()
+		let body = '';
+		const current = new Date();
 
-		res.on( 'data', function ( chunk ) {
-			body += chunk
-		} )
+		res.on( 'data', ( chunk ) => {
+
+			body += chunk;
+
+		} );
 
 		res.on( 'end', () => {
 
-			body = JSON.parse( body )
+			body = JSON.parse( body );
 
 			if ( res.statusCode !== 200 ) {
+
 				body.errors.forEach( e => {
-					// vscode.window.showErrorMessage(`${e.message} (${res.statusCode})`);
-					outputCheck.replace( `[${current.toLocaleTimeString()}] [Check Development Mode status] Error: ${e.message} (${res.statusCode}) ` )
-				} )
-				statusBarError()
+
+					outputCheck.replace( `[${ current.toLocaleTimeString() }] [Check Development Mode status] Error: ${ e.message } (${ res.statusCode }) ` );
+
+				} );
+
+				statusBarError();
+
 			} else {
-				devModeStatusCallback( body.result.value, body.result.time_remaining )
-				outputCheck.replace( `[${current.toLocaleTimeString()}] Periodic check: Development Mode is ${body.result.value.toUpperCase()}` )
+
+				devModeStatusCallback( body.result.value, body.result.timeRemaining );
+				outputCheck.replace( `[${ current.toLocaleTimeString() }] Periodic check: Development Mode is ${ body.result.value.toUpperCase() }` );
+
 			}
 
-		} )
+		} );
 
-	} )
+	} );
 
-	req.on( 'error', function ( e ) {
-		vscode.window.showErrorMessage( e.message )
-		outputCheck.replace( `[${current.toLocaleTimeString()}] Error: ${e.message}` )
-	} )
+	req.on( 'error', ( e ) => {
 
-	req.end()
+		const current = new Date();
+
+		vscode.window.showErrorMessage( e.message );
+		outputCheck.replace( `[${ current.toLocaleTimeString() }] Error: ${ e.message }` );
+
+	} );
+
+	req.end();
 
 }
 
 
-// Purge Cache
+/* Purge Cache */
 function purgeCacheFn() {
 
 	const postData = JSON.stringify( {
 		'purge_everything': true
-	} )
+	} );
 
 	const options = {
 		host: host,
@@ -321,64 +365,82 @@ function purgeCacheFn() {
 			'X-Auth-Key': AUTH_KEY,
 			'Content-Type': 'application/json'
 		}
-	}
+	};
 
-	const req = https.request( options, function ( res ) {
+	const req = https.request( options, ( res ) => {
 
-		let current = new Date()
-		var body = ''
-		res.on( 'data', function ( chunk ) {
-			body += chunk
-		} )
+		const current = new Date();
+		let body = '';
+
+		res.on( 'data', ( chunk ) => {
+
+			body += chunk;
+
+		} );
 
 		res.on( 'end', () => {
 
-			body = JSON.parse( body )
+			body = JSON.parse( body );
+
 			if ( res.statusCode !== 200 ) {
+
 				body.errors.forEach( e => {
-					vscode.window.showErrorMessage( `Purge Cache: ${e.message} (${res.statusCode})` )
-					outputLogs.appendLine( `[${current.toLocaleTimeString()}] [Purge Cache] Error: ${e.message} (${res.statusCode}) ` )
-				} )
+
+					vscode.window.showErrorMessage( `Purge Cache: ${ e.message } (${ res.statusCode })` );
+					outputLogs.appendLine( `[${ current.toLocaleTimeString() }] [Purge Cache] Error: ${ e.message } (${ res.statusCode }) ` );
+
+				} );
+
 			} else {
-				vscode.window.showInformationMessage( 'Cloudflare Cache purged.' )
-				outputLogs.appendLine( `[${current.toLocaleTimeString()}] Cache purged.` )
+
+				vscode.window.showInformationMessage( 'Cloudflare Cache purged.' );
+				outputLogs.appendLine( `[${ current.toLocaleTimeString() }] Cache purged.` );
+
 			}
 
-		} )
+		} );
 
-	} )
+	} );
 
-	req.on( 'error', function ( e ) {
-		console.log( 'problem with request: ' + e.message )
-	} )
+	req.on( 'error', ( e ) => {
 
-	req.write( postData )
+		console.log( 'problem with request: ' + e.message );
 
-	req.end()
+	} );
+
+	req.write( postData );
+
+	req.end();
 
 }
 
 
-// Check Development Mode Status
+/* Check Development Mode Status */
 function checkStatus() {
-	// check if already an interval has been set up
+
 	if ( !interval ) {
-		interval = setInterval( devModeCheck, checkStatusInterval * 1000 )
+
+		interval = setInterval( devModeCheck, checkStatusInterval * 1000 );
+
 	} else {
-		clearInterval( interval )
-		interval = setInterval( devModeCheck, checkStatusInterval * 1000 )
+
+		clearInterval( interval );
+		interval = setInterval( devModeCheck, checkStatusInterval * 1000 );
+
 	}
 
-	devModeCheck()
-}
+	devModeCheck();
 
+}
 
 
 function deactivate() {
-	clearInterval( interval )
+
+	clearInterval( interval );
+
 }
 
 module.exports = {
 	activate,
 	deactivate
-}
+};
