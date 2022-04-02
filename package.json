@@ -1,0 +1,125 @@
+{
+  "name": "cloudflare-devtools",
+	"displayName": "Cloudflare DevTools",
+	"description": "Manage Cloudflare's Development Mode and Cache within VS Code.",
+	"version": "1.0.0",
+	"engines": {
+		"vscode": "^1.65.2"
+	},
+	"categories": [
+		"Other"
+	],
+	"activationEvents": [
+		"onStartupFinished"
+	],
+	"main": "./extension.js",
+	"contributes": {
+		"commands": [
+			{
+				"command": "cloudflareDevTools.devOn",
+				"title": "Development Mode | ON",
+				"category": "Cloudflare DevTools"
+			},
+			{
+				"command": "cloudflareDevTools.devOff",
+				"title": "Development Mode | OFF",
+				"category": "Cloudflare DevTools"
+			},
+			{
+				"command": "cloudflareDevTools.purgeCache",
+				"title": "Purge Cache",
+				"category": "Cloudflare DevTools"
+			},
+			{
+				"command": "cloudflareDevTools.commands",
+				"title": "Cloudflare DevTools Commands"
+			}
+		],
+		"menus": {
+			"commandPalette": [
+				{
+					"command": "cloudflareDevTools.commands",
+					"when": "false"
+				}
+			]
+		},
+		"viewsContainers": {
+			"activitybar": [
+				{
+					"id": "cloudflareDevTools-view",
+					"title": "Cloudflare Dev Tools",
+					"icon": "resources/cloud.svg"
+				}
+			]
+		},
+		"views": {
+			"cloudflareDevTools-view": [
+				{
+					"id": "cloudflareDevTools-tree",
+					"name": "Commands"
+				}
+			]
+		},
+		"configuration": [{
+			"title": "Cloudflare DevTools",
+			"type": "object",
+			"id": "cloudflareDevTools",
+			"properties": {
+					"cloudflareDevTools.api.key": {
+						"type": "string",
+						"markdownDescription": "Generated on the [My Account](https://dash.cloudflare.com/profile/api-tokens) page.  \n - *Permissions*: \n    - `Zone > Zone Settings > Edit` \n    - `Zone > Zone > Edit`  \n - *Zone Resources*: \n    - `Include > Specific zone > your_domain`",
+						"order": 1
+					},
+					"cloudflareDevTools.api.email": {
+						"type": "string",
+						"description": "Email address associated with your account.",
+						"order": 2
+					},
+					"cloudflareDevTools.api.zoneID": {
+						"type": "string",
+						"description": "Found in the Overview of your domain in your Cloudflare account.",
+						"order": 3
+					},
+					"cloudflareDevTools.cache.purgeAutomatically": {
+						"type": "boolean",
+						"default": true,
+						"markdownDescription": "Purge Cloudflare's cache automatically after turning on `Development Mode`",
+						"order": 4
+					},
+					"cloudflareDevTools.developmentModeStatus.enable": {
+						"type": "boolean",
+						"default": true,
+						"markdownDescription": "Sends periodic requests to the API to check whether `Development Mode` is `On` or `Off`.  \n *(Recommended - will update the cloud icon's appearance in the status bar depending on Dev. Mode's status)*.",
+						"order": 5
+					},
+					"cloudflareDevTools.developmentModeStatus.interval": {
+						"type": "integer",
+						"minimum": 5,
+						"default": 60,
+						"markdownDescription": "How often *(in seconds)* to ping the API, to check whether `Development Mode` is On or Off.  \n `#cloudflareDevTools.developmentModeStatus.enable#` needs to be `true`.",
+						"order": 6
+					}
+
+			}
+		}]
+
+
+	},
+	"scripts": {
+		"lint": "eslint .",
+		"pretest": "npm run lint",
+		"test": "node ./test/runTest.js"
+	},
+	"devDependencies": {
+        "@types/vscode": "^1.66.0",
+        "@types/glob": "^7.2.0",
+        "@types/mocha": "^9.1.0",
+        "@types/node": "14.x",
+        "eslint": "^8.9.0",
+        "glob": "^7.2.0",
+        "mocha": "^9.2.1",
+        "typescript": "^4.5.5",
+        "@vscode/test-electron": "^2.1.2"
+    }
+
+}
