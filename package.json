@@ -3,7 +3,7 @@
   "displayName": "Cloudflare DevTools",
   "description": "Manage Cloudflare's Development Mode and Cache from VS Code.",
   "version": "1.0.0",
-  "publisher": "Alessandro Benassi",
+  "publisher": "AlessandroBenassi",
   "repository":{
     "type": "git",
     "url": "https://github.com/solid-pixel/vscode-cloudflareDevTools.git"
