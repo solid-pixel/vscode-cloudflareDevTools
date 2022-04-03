@@ -4,6 +4,8 @@ A [Visual Studio Code](https://code.visualstudio.com/) [extension](https://marke
 
 The extension relies on [Cloudflare's API](https://api.cloudflare.com/) and will send requests in the background to set/retrive the Dev. Mode status.
 
+&nbsp;
+
 ## Features
 
 - Turn Cloudflare's **Development Mode On/Off**.
@@ -11,6 +13,8 @@ The extension relies on [Cloudflare's API](https://api.cloudflare.com/) and will
 - Purge Cloudflare's **cache** _(with option to purge it automatically when you turn Dev. Mode on)_.
 
 ![Preview](assets/preview.gif)
+
+&nbsp;
 
 ## Getting started
 
@@ -26,6 +30,8 @@ The extension relies on [Cloudflare's API](https://api.cloudflare.com/) and will
 
 Whatever option you choose, the status bar icon will be highlighted while Development Mode is on (unless disabled in the settings).
 The color depends on your theme's `statusBarItem.warningBackground`.
+
+&nbsp;
 
 ## Extension Settings
 
@@ -43,6 +49,8 @@ This extension contributes the following settings:
 - `cloudflareDevTools.developmentModeStatus.enable`: Sends periodic requests to the API to check whether `Development Mode` is `On` or `Off`. _(Recommended - will update the cloud icon's appearance in the status bar depending on Dev. Mode's status)_."
 - `cloudflareDevTools.developmentModeStatus.interval`: How often _(in seconds)_ to ping the API, to check whether `Development Mode` is On or Off. `cloudflareDevTools.developmentModeStatus.enable` needs to be `true`.
 
+&nbsp;
+
 ## Useful Links
 
 - [Cloudflare API](https://api.cloudflare.com/)
@@ -50,15 +58,23 @@ This extension contributes the following settings:
 - [Extension on the VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=alessandro-benassi.cloudflare-devtools)
 - [My LinkedIn profile](https://www.linkedin.com/in/ap-benassi/)
 
+&nbsp;
+
 ## Have feedback or issues?
 
 Please [file an issue](https://github.com/solid-pixel/vscode-cloudflareDevTools/issues/new) on the GitHub repository.
+
+&nbsp;
 
 ## I love Pizza 🍕
 
 [![ko-fi](assets/pizza.png)](https://ko-fi.com/N4N7BY7DX)
 
+&nbsp;
+
 ---
+
+&nbsp;
 
 ## Release Notes
 
