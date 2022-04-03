@@ -12,6 +12,9 @@ The extension relies on [Cloudflare's API](https://api.cloudflare.com/) and will
 - Check Cloudflare's **Development Mode's status** _(On or Off)_ by highlighting an icon in the **status bar** _(optional)_.
 - Purge Cloudflare's **cache** _(with option to purge it automatically when you turn Dev. Mode on)_.
 
+&nbsp;
+
+
 ![Preview](assets/preview.gif)
 
 &nbsp;
