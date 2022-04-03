@@ -14,7 +14,6 @@ The extension relies on [Cloudflare's API](https://api.cloudflare.com/) and will
 
 &nbsp;
 
-
 ![Preview](assets/preview.gif)
 
 &nbsp;
@@ -27,9 +26,9 @@ The extension relies on [Cloudflare's API](https://api.cloudflare.com/) and will
 
 **2. To reveal the available commands, you have several options:**
 
-  - Click on the cloud icon in the **Status Bar**
-  - Use the tree view in the **Activity Bar**
-  - Invoke the commands from the **Command Palette**
+- Click on the cloud icon in the **Status Bar**
+- Use the tree view in the **Activity Bar**
+- Invoke the commands from the **Command Palette**
 
 Whatever option you choose, the status bar icon will be highlighted while Development Mode is on (unless disabled in the settings).
 The color depends on your theme's `statusBarItem.warningBackground`.
@@ -74,13 +73,3 @@ Please [file an issue](https://github.com/solid-pixel/vscode-cloudflareDevTools/
 [![ko-fi](assets/pizza.png)](https://ko-fi.com/N4N7BY7DX)
 
 &nbsp;
-
----
-
-&nbsp;
-
-## Release Notes
-
-- ### **1.0.0**
-
-  - Initial release of Cloudflare DevTools
