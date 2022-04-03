@@ -21,15 +21,15 @@ The extension relies on [Cloudflare's API](https://api.cloudflare.com/) and will
 
 ## Getting started
 
-1. Open the [Extension's Settings](#extension-settings) and fill in these required fields:
+**1. Open the [Extension's Settings](#extension-settings) and fill in these required fields:**
 
 ![Required settings](assets/settings.png)
 
-2. To reveal the available commands, you have several options:
+**2. To reveal the available commands, you have several options:**
 
-- Click on the cloud icon in the **Status Bar**
-- Use the tree view in the **Activity Bar**
-- Invoke the commands from the **Command Palette**
+  - Click on the cloud icon in the **Status Bar**
+  - Use the tree view in the **Activity Bar**
+  - Invoke the commands from the **Command Palette**
 
 Whatever option you choose, the status bar icon will be highlighted while Development Mode is on (unless disabled in the settings).
 The color depends on your theme's `statusBarItem.warningBackground`.
