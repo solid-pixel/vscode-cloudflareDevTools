@@ -13,7 +13,7 @@
   },
   "galleryBanner": {
     "color": "#172031",
-    "theme": "light"
+    "theme": "dark"
   },
   "icon": "assets/logo.png",
   "badges": [
