@@ -1,4 +1,3 @@
-
 const vscode = require( 'vscode' );
 const DataProvider = require( './src/dataProvider.js' );
 

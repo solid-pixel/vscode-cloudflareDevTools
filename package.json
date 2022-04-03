@@ -1,21 +1,49 @@
 {
   "name": "cloudflare-devtools",
   "displayName": "Cloudflare DevTools",
-  "description": "Manage Cloudflare's Development Mode and Cache within VS Code.",
+  "description": "Manage Cloudflare's Development Mode and Cache from VS Code.",
   "version": "1.0.0",
-  // "publisher": "",
+  "publisher": "Alessandro Benassi",
+  "repository":{
+    "type": "git",
+    "url": "https://github.com/solid-pixel/vscode-cloudflareDevTools.git"
+  },
+  "bugs": {
+    "url": "https://github.com/solid-pixel/vscode-cloudflareDevTools/issues/new"
+  },
+  "galleryBanner": {
+    "color": "#172031",
+    "theme": "light"
+  },
+  "icon": "assets/logo.png",
+  "badges": [
+    {
+      "url": "https://badgen.net/vs-marketplace/v/AlessandroBenassi.cloudflare-devtools",
+      "href": "https://marketplace.visualstudio.com/items?itemName=alessandro-benassi.cloudflare-devtools",
+      "description": "Latest version"
+    },
+    {
+      "url": "https://badgen.net/badge/icon/kofi?icon=kofi&label=Pizza!&color=red",
+      "href": "https://ko-fi.com/solidpixel",
+      "description": "Get me a slice of pizza on Ko-fi ❤️"
+    }
+  ],
+  "extensionKind": [
+    "workspace",
+    "ui"
+  ],
   "engines": {
-    "vscode": "^1.65.2"
+    "vscode": "^1.66.0"
   },
   "categories": [
     "Other"
   ],
   "keywords": [
     "cloudflare", 
-    "cache", 
     "development",
-    "api",
-    "vs code"
+    "development mode",
+    "cache", 
+    "api"
   ],
   "activationEvents": [
     "onStartupFinished"
@@ -55,8 +83,8 @@
       "activitybar": [
         {
           "id": "cloudflareDevTools-view",
-          "title": "Cloudflare Dev Tools",
-          "icon": "resources/cloud.svg"
+          "title": "Cloudflare DevTools",
+          "icon": "assets/cloud.svg"
         }
       ]
     },
