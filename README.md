@@ -64,7 +64,7 @@ This extension contributes the following settings:
 
 ## Changelog
 
-[Click here to see the changelog]().
+[Click here to see the changelog](https://marketplace.visualstudio.com/items/AlessandroBenassi.cloudflare-devtools/changelog).
 
 &nbsp;
 
