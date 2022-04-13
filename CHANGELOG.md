@@ -1,9 +1,16 @@
-# Change Log
+# Changelog
 
-- ## **1.0.0**
+All notable changes to this project will be documented in this file.
 
-  - Initial release of Cloudflare DevTools
+## **1.0.2**
 
-- ## **1.0.1**
+- Set a 3s delay before clearing the cache automatically upon turning Development Mode on.
+- Hovering over the cloud icon in the status bar will now show how many minutes are left before Development Mode will turn off automatically (Cloudflare turns it off automatically 3 hours after the last time you've enabled it).
 
-  - Bug fixes
+## **1.0.1**
+
+- Bug fixes
+
+## **1.0.0**
+
+- Initial release of Cloudflare DevTools

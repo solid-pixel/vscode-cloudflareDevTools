@@ -249,7 +249,11 @@ function devModeSwitch( value ) {
 
 				if ( purgeCacheAutomatically == true ) {
 
-					purgeCacheFn();
+					setTimeout( () => {
+
+						purgeCacheFn();
+
+					}, 3000 );
 
 				}
 
@@ -324,7 +328,7 @@ function devModeCheck() {
 
 			} else {
 
-				devModeStatusCallback( body.result.value, body.result.timeRemaining );
+				devModeStatusCallback( body.result.value, body.result.time_remaining );
 				outputCheck.replace( `[${ current.toLocaleTimeString() }] Periodic check: Development Mode is ${ body.result.value.toUpperCase() }` );
 
 			}

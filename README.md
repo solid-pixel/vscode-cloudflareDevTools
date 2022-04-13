@@ -1,8 +1,8 @@
 # Cloudflare DevTools
 
-A [Visual Studio Code](https://code.visualstudio.com/) [extension](https://marketplace.visualstudio.com/items?itemName=alessandro-benassi.cloudflare-devtools) to manage Cloudflare's Development Mode and Cache from VS Code.
+A [Visual Studio Code](https://code.visualstudio.com/) [extension](https://marketplace.visualstudio.com/items?itemName=alessandro-benassi.cloudflare-devtools) to manage Cloudflare's **Development Mode** and purge the **Cache** from within VS Code.
 
-The extension relies on [Cloudflare's API](https://api.cloudflare.com/) and will send requests in the background to set/retrive the Dev. Mode status.
+The extension relies on [Cloudflare's API](https://api.cloudflare.com/) and will send requests in the background to set/retrive the Development Mode status.
 
 &nbsp;
 
@@ -10,7 +10,7 @@ The extension relies on [Cloudflare's API](https://api.cloudflare.com/) and will
 
 - Turn Cloudflare's **Development Mode On/Off**.
 - Check Cloudflare's **Development Mode's status** _(On or Off)_ by highlighting an icon in the **status bar** _(optional)_.
-- Purge Cloudflare's **cache** _(with option to purge it automatically when you turn Dev. Mode on)_.
+- Purge Cloudflare's **cache** _(with option to purge it automatically when you turn Development Mode on)_.
 
 &nbsp;
 
@@ -59,6 +59,12 @@ This extension contributes the following settings:
 - [GitHub Repository](https://github.com/solid-pixel/vscode-cloudflareDevTools)
 - [Extension on the VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=alessandro-benassi.cloudflare-devtools)
 - [My LinkedIn profile](https://www.linkedin.com/in/ap-benassi/)
+
+&nbsp;
+
+## Changelog
+
+[Click here to see the changelog]().
 
 &nbsp;
 
