@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## **1.0.3**
+
+- Security fixes (updated eslint and its dependencies to).
+
 ## **1.0.2**
 
 - Set a 3s delay before clearing the cache automatically upon turning Development Mode on.
