@@ -1,14 +1,14 @@
-const vscode = require( 'vscode' );
-const DataProvider = require( './src/dataProvider.js' );
+const vscode = require('vscode');
+const DataProvider = require('./src/dataProvider.js');
 
 /**
  * @param {vscode.ExtensionContext} context
  */
 
 
-const statusBar = vscode.window.createStatusBarItem( vscode.StatusBarAlignment.Right );
-const config = vscode.workspace.getConfiguration( 'cloudflareDevTools' );
-const https = require( 'https' );
+const statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right);
+const config = vscode.workspace.getConfiguration('cloudflareDevTools');
+const https = require('https');
 
 let interval;
 
@@ -24,52 +24,52 @@ const port = '443';
 let path = '/client/v4/zones/' + ZONE_ID;
 
 // const colorOn = new vscode.ThemeColor("activityBarBadge.background");
-const colorOff = new vscode.ThemeColor( 'statusBar.foreground' );
+const colorOff = new vscode.ThemeColor('statusBar.foreground');
 
 /* Output Log */
-const outputCheck = vscode.window.createOutputChannel( 'Cloudflare DevTools | Status Check' );
-const outputLogs = vscode.window.createOutputChannel( 'Cloudflare DevTools | Logs' );
+const outputCheck = vscode.window.createOutputChannel('Cloudflare DevTools | Status Check');
+const outputLogs = vscode.window.createOutputChannel('Cloudflare DevTools | Logs');
 
-function activate( context ) {
+function activate(context) {
 
 	/* Listen to config changes */
 	configChanged();
 
 	/* Commands */
-	const devOn = vscode.commands.registerCommand( 'cloudflareDevTools.devOn',() => {
+	const devOn = vscode.commands.registerCommand('cloudflareDevTools.devOn', () => {
 
-		devModeSwitch( 'on' );
+		devModeSwitch('on');
 
-	} );
+	});
 
-	const devOff = vscode.commands.registerCommand( 'cloudflareDevTools.devOff', () => {
+	const devOff = vscode.commands.registerCommand('cloudflareDevTools.devOff', () => {
 
-		devModeSwitch( 'off' );
+		devModeSwitch('off');
 
-	} );
+	});
 
-	const purgeCache = vscode.commands.registerCommand( 'cloudflareDevTools.purgeCache', () => {
+	const purgeCache = vscode.commands.registerCommand('cloudflareDevTools.purgeCache', () => {
 
 		purgeCacheFn();
 
-	} );
+	});
 
-	const commands = vscode.commands.registerCommand( 'cloudflareDevTools.commands', () => {
+	const commands = vscode.commands.registerCommand('cloudflareDevTools.commands', () => {
 
-		vscode.commands.executeCommand( 'workbench.action.quickOpen', '>Cloudflare DevTools:' );
+		vscode.commands.executeCommand('workbench.action.quickOpen', '>Cloudflare DevTools:');
 
-	} );
+	});
 
 	/* Tree Data Provider */
 	const myData = new DataProvider();
-	const view = vscode.window.createTreeView( 'cloudflareDevTools-tree', {
+	const view = vscode.window.createTreeView('cloudflareDevTools-tree', {
 		treeDataProvider: myData,
-	} );
+	});
 
 	/* Check Status */
-	if ( AUTH_KEY && AUTH_EMAIL && ZONE_ID ) {
+	if (AUTH_KEY && AUTH_EMAIL && ZONE_ID) {
 
-		if ( checkStatusEnable == true ) {
+		if (checkStatusEnable == true) {
 
 			checkStatus();
 
@@ -81,23 +81,23 @@ function activate( context ) {
 	statusBarFn();
 
 	/* Subscriptions */
-	context.subscriptions.push( devOn );
-	context.subscriptions.push( devOff );
-	context.subscriptions.push( purgeCache );
-	context.subscriptions.push( commands );
-	context.subscriptions.push( view );
-	context.subscriptions.push( statusBar );
+	context.subscriptions.push(devOn);
+	context.subscriptions.push(devOff);
+	context.subscriptions.push(purgeCache);
+	context.subscriptions.push(commands);
+	context.subscriptions.push(view);
+	context.subscriptions.push(statusBar);
 
 } // activate()
 
 /* Listen for config changes */
 function configChanged() {
 
-	vscode.workspace.onDidChangeConfiguration( ( e ) => {
+	vscode.workspace.onDidChangeConfiguration((e) => {
 
-		if ( e.affectsConfiguration( 'cloudflareDevTools' ) ) {
+		if (e.affectsConfiguration('cloudflareDevTools')) {
 
-			const config = vscode.workspace.getConfiguration( 'cloudflareDevTools' );
+			const config = vscode.workspace.getConfiguration('cloudflareDevTools');
 
 			AUTH_KEY = config.api.key;
 			AUTH_EMAIL = config.api.email;
@@ -107,15 +107,15 @@ function configChanged() {
 			checkStatusEnable = config.developmentModeStatus.enable;
 			checkStatusInterval = config.developmentModeStatus.interval;
 
-			if ( checkStatusEnable == true ) {
+			if (checkStatusEnable == true) {
 
 				checkStatus();
 
 			} else {
 
-				clearInterval( interval );
+				clearInterval(interval);
 				statusBarOff();
-				outputCheck.replace( 'Periodic check has been disabled.' );
+				outputCheck.replace('Periodic check has been disabled.');
 
 			}
 
@@ -124,7 +124,7 @@ function configChanged() {
 		}
 
 
-	} );
+	});
 
 }
 
@@ -141,14 +141,14 @@ function statusBarFn() {
 
 
 /* Status Bar On */
-function statusBarOn( timeRemaining ) {
+function statusBarOn(timeRemaining) {
 
-	const timeLeft = Math.floor( timeRemaining / 60 );
+	const timeLeft = Math.floor(timeRemaining / 60);
 
 	// statusBar.color = colorOn;
-	statusBar.tooltip = `Cloudflare Development Mode: ON (${ timeLeft } minutes left)`;
+	statusBar.tooltip = `Cloudflare Development Mode: ON (${timeLeft} minutes left)`;
 	statusBar.text = '$(cloud)';
-	statusBar.backgroundColor = new vscode.ThemeColor( 'statusBarItem.warningBackground' );
+	statusBar.backgroundColor = new vscode.ThemeColor('statusBarItem.warningBackground');
 
 }
 
@@ -170,19 +170,19 @@ function statusBarError() {
 	statusBar.color = colorOff;
 	statusBar.text = '$(cloud)';
 	statusBar.tooltip = 'Couldn\'t ping the API, please check your settings.';
-	statusBar.backgroundColor = new vscode.ThemeColor( 'statusBarItem.errorBackground' );
+	statusBar.backgroundColor = new vscode.ThemeColor('statusBarItem.errorBackground');
 
 }
 
 
 /* Development Mode */
-function devModeStatusCallback( value, timeRemaining ) {
+function devModeStatusCallback(value, timeRemaining) {
 
-	if ( checkStatusEnable == true ) {
+	if (checkStatusEnable == true) {
 
-		if ( value == 'on' ) {
+		if (value == 'on') {
 
-			statusBarOn( timeRemaining );
+			statusBarOn(timeRemaining);
 
 		} else {
 
@@ -197,11 +197,11 @@ function devModeStatusCallback( value, timeRemaining ) {
 
 
 /* Switch Dev Mode ON/OFF */
-function devModeSwitch( value ) {
+function devModeSwitch(value) {
 
-	const postData = JSON.stringify( {
+	const postData = JSON.stringify({
 		'value': value
-	} );
+	});
 
 	const options = {
 		host: host,
@@ -215,64 +215,64 @@ function devModeSwitch( value ) {
 		}
 	};
 
-	const req = https.request( options, ( res ) => {
+	const req = https.request(options, (res) => {
 
-		// console.log(res.statusCode);
+		console.log(res.statusCode);
 		const current = new Date();
 		let body = '';
 
-		res.on( 'data', ( chunk ) => {
+		res.on('data', (chunk) => {
 
 			body += chunk;
 
-		} );
+		});
 
-		res.on( 'end', () => {
+		res.on('end', () => {
 
-			body = JSON.parse( body );
-			// console.log(body);
+			body = JSON.parse(body);
+			console.log(body);
 
-			if ( res.statusCode !== 200 ) {
+			if (res.statusCode !== 200) {
 
-				body.errors.forEach( e => {
+				body.errors.forEach(e => {
 
-					vscode.window.showErrorMessage( `${ e.message } (${ res.statusCode })` );
-					outputLogs.appendLine( `[${ current.toLocaleTimeString() }] [Development Mode] Error: ${ e.message } (${ res.statusCode })` );
+					vscode.window.showErrorMessage(`${e.message} (${res.statusCode})`);
+					outputLogs.appendLine(`[${current.toLocaleTimeString()}] [Development Mode] Error: ${e.message} (${res.statusCode})`);
 
-				} );
+				});
 
 			} else {
 
-				vscode.window.showInformationMessage( `Cloudflare Development Mode is now ${ value.toUpperCase() }.` );
-				outputLogs.appendLine( `[${ current.toLocaleTimeString() }] Development Mode has been turned ${ body.result.value.toUpperCase() }` );
-				devModeStatusCallback( body.result.value );
+				vscode.window.showInformationMessage(`Cloudflare Development Mode is now ${value.toUpperCase()}.`);
+				outputLogs.appendLine(`[${current.toLocaleTimeString()}] Development Mode has been turned ${body.result.value.toUpperCase()}`);
+				devModeStatusCallback(body.result.value);
 
-				if ( purgeCacheAutomatically == true ) {
+				if (purgeCacheAutomatically == true) {
 
-					setTimeout( () => {
+					setTimeout(() => {
 
 						purgeCacheFn();
 
-					}, 3000 );
+					}, 3000);
 
 				}
 
 			}
 
-		} );
+		});
 
-	} );
+	});
 
-	req.on( 'error', ( e ) => {
+	req.on('error', (e) => {
 
 		const current = new Date();
 
-		vscode.window.showErrorMessage( e.message );
-		outputLogs.appendLine( `[${ current.toLocaleTimeString() }] Error: ${ e.message }` );
+		vscode.window.showErrorMessage(e.message);
+		outputLogs.appendLine(`[${current.toLocaleTimeString()}] Error: ${e.message}`);
 
-	} );
+	});
 
-	req.write( postData );
+	req.write(postData);
 
 	req.end();
 
@@ -282,8 +282,8 @@ function devModeSwitch( value ) {
 /* Check if Dev Mode is ON/OFF */
 function devModeCheck() {
 
-	const config = vscode.workspace.getConfiguration( 'cloudflareDevTools' );
-	const https = require( 'https' );
+	const config = vscode.workspace.getConfiguration('cloudflareDevTools');
+	const https = require('https');
 
 	/* Config Variables */
 	const AUTH_KEY = config.api.key;
@@ -301,50 +301,50 @@ function devModeCheck() {
 		}
 	};
 
-	const req = https.request( options, ( res ) => {
+	const req = https.request(options, (res) => {
 
 		let body = '';
 		const current = new Date();
 
-		res.on( 'data', ( chunk ) => {
+		res.on('data', (chunk) => {
 
 			body += chunk;
 
-		} );
+		});
 
-		res.on( 'end', () => {
+		res.on('end', () => {
 
-			body = JSON.parse( body );
+			body = JSON.parse(body);
 
-			if ( res.statusCode !== 200 ) {
+			if (res.statusCode !== 200) {
 
-				body.errors.forEach( e => {
+				body.errors.forEach(e => {
 
-					outputCheck.replace( `[${ current.toLocaleTimeString() }] [Check Development Mode status] Error: ${ e.message } (${ res.statusCode }) ` );
+					outputCheck.replace(`[${current.toLocaleTimeString()}] [Check Development Mode status] Error: ${e.message} (${res.statusCode}) `);
 
-				} );
+				});
 
 				statusBarError();
 
 			} else {
 
-				devModeStatusCallback( body.result.value, body.result.time_remaining );
-				outputCheck.replace( `[${ current.toLocaleTimeString() }] Periodic check: Development Mode is ${ body.result.value.toUpperCase() }` );
+				devModeStatusCallback(body.result.value, body.result.time_remaining);
+				outputCheck.replace(`[${current.toLocaleTimeString()}] Periodic check: Development Mode is ${body.result.value.toUpperCase()}`);
 
 			}
 
-		} );
+		});
 
-	} );
+	});
 
-	req.on( 'error', ( e ) => {
+	req.on('error', (e) => {
 
 		const current = new Date();
 
-		vscode.window.showErrorMessage( e.message );
-		outputCheck.replace( `[${ current.toLocaleTimeString() }] Error: ${ e.message }` );
+		vscode.window.showErrorMessage(e.message);
+		outputCheck.replace(`[${current.toLocaleTimeString()}] Error: ${e.message}`);
 
-	} );
+	});
 
 	req.end();
 
@@ -354,9 +354,9 @@ function devModeCheck() {
 /* Purge Cache */
 function purgeCacheFn() {
 
-	const postData = JSON.stringify( {
+	const postData = JSON.stringify({
 		'purge_everything': true
-	} );
+	});
 
 	const options = {
 		host: host,
@@ -370,48 +370,48 @@ function purgeCacheFn() {
 		}
 	};
 
-	const req = https.request( options, ( res ) => {
+	const req = https.request(options, (res) => {
 
 		const current = new Date();
 		let body = '';
 
-		res.on( 'data', ( chunk ) => {
+		res.on('data', (chunk) => {
 
 			body += chunk;
 
-		} );
+		});
 
-		res.on( 'end', () => {
+		res.on('end', () => {
 
-			body = JSON.parse( body );
+			body = JSON.parse(body);
 
-			if ( res.statusCode !== 200 ) {
+			if (res.statusCode !== 200) {
 
-				body.errors.forEach( e => {
+				body.errors.forEach(e => {
 
-					vscode.window.showErrorMessage( `Purge Cache: ${ e.message } (${ res.statusCode })` );
-					outputLogs.appendLine( `[${ current.toLocaleTimeString() }] [Purge Cache] Error: ${ e.message } (${ res.statusCode }) ` );
+					vscode.window.showErrorMessage(`Purge Cache: ${e.message} (${res.statusCode})`);
+					outputLogs.appendLine(`[${current.toLocaleTimeString()}] [Purge Cache] Error: ${e.message} (${res.statusCode}) `);
 
-				} );
+				});
 
 			} else {
 
-				vscode.window.showInformationMessage( 'Cloudflare Cache purged.' );
-				outputLogs.appendLine( `[${ current.toLocaleTimeString() }] Cache purged.` );
+				vscode.window.showInformationMessage('Cloudflare Cache purged.');
+				outputLogs.appendLine(`[${current.toLocaleTimeString()}] Cache purged.`);
 
 			}
 
-		} );
+		});
 
-	} );
+	});
 
-	req.on( 'error', ( e ) => {
+	req.on('error', (e) => {
 
-		console.log( 'problem with request: ' + e.message );
+		console.log('problem with request: ' + e.message);
 
-	} );
+	});
 
-	req.write( postData );
+	req.write(postData);
 
 	req.end();
 
@@ -421,14 +421,14 @@ function purgeCacheFn() {
 /* Check Development Mode Status */
 function checkStatus() {
 
-	if ( !interval ) {
+	if (!interval) {
 
-		interval = setInterval( devModeCheck, checkStatusInterval * 1000 );
+		interval = setInterval(devModeCheck, checkStatusInterval * 1000);
 
 	} else {
 
-		clearInterval( interval );
-		interval = setInterval( devModeCheck, checkStatusInterval * 1000 );
+		clearInterval(interval);
+		interval = setInterval(devModeCheck, checkStatusInterval * 1000);
 
 	}
 
@@ -439,7 +439,7 @@ function checkStatus() {
 
 function deactivate() {
 
-	clearInterval( interval );
+	clearInterval(interval);
 
 }
 

@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## **1.0.4**
+
+- The README was referring to the wrong type of API Key, apologies for that! 🙏🏻
+
 ## **1.0.3**
 
 - Security fixes (updated eslint and its dependencies to).

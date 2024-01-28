@@ -2,7 +2,7 @@
   "name": "cloudflare-devtools",
   "displayName": "Cloudflare DevTools",
   "description": "Manage Cloudflare's Development Mode and Cache from VS Code.",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "publisher": "AlessandroBenassi",
   "repository": {
     "type": "git",
@@ -104,7 +104,7 @@
         "properties": {
           "cloudflareDevTools.api.key": {
             "type": "string",
-            "markdownDescription": "Generated on the [My Account](https://dash.cloudflare.com/profile/api-tokens) page.  \n - *Permissions*: \n    - `Zone > Zone Settings > Edit` \n    - `Zone > Zone > Edit`  \n - *Zone Resources*: \n    - `Include > Specific zone > your_domain`",
+            "markdownDescription": "Your [Global API Key](https://dash.cloudflare.com/profile/api-tokens).",
             "order": 1
           },
           "cloudflareDevTools.api.email": {

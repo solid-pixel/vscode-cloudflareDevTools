@@ -39,12 +39,8 @@ The color depends on your theme's `statusBarItem.warningBackground`.
 
 This extension contributes the following settings:
 
-- `cloudflareDevTools.api.key`: Your Cloudflare API key, generated on the [My Account](https://dash.cloudflare.com/profile/api-tokens) page.
-  - _Permissions_:
-    - `Zone > Zone Settings > Edit`
-    - `Zone > Zone > Edit`
-  - _Zone Resources_:
-    - `Include > Specific zone > your_domain`
+- `cloudflareDevTools.api.key`: Your Cloudflare [Global API Key	
+](https://dash.cloudflare.com/profile/api-tokens).
 - `cloudflareDevTools.api.email`: Email address associated with your account.
 - `cloudflareDevTools.api.zoneID`: Your zone ID, found in the Overview of your domain in your Cloudflare account.
 - `cloudflareDevTools.cache.purgeAutomatically`: Purge Cloudflare's cache automatically after turning on `Development Mode.
