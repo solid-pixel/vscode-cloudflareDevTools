@@ -53,7 +53,7 @@ This extension contributes the following settings:
 
 - [Cloudflare API](https://api.cloudflare.com/)
 - [GitHub Repository](https://github.com/solid-pixel/vscode-cloudflareDevTools)
-- [Extension on the VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=alessandro-benassi.cloudflare-devtools)
+- [Extension on the VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=AlessandroBenassi.cloudflare-devtools)
 - [My LinkedIn profile](https://www.linkedin.com/in/ap-benassi/)
 
 &nbsp;
