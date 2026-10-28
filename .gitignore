@@ -2,6 +2,7 @@
 .vscode-clean/**
 .vscode-test/**
 .vscode-test-web/**
-dist
-out
-node_modules
+dist/
+out/
+node_modules/
+*.vsix
