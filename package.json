@@ -21,11 +21,6 @@
       "url": "https://badgen.net/vs-marketplace/v/AlessandroBenassi.cloudflare-devtools",
       "href": "https://marketplace.visualstudio.com/items?itemName=AlessandroBenassi.cloudflare-devtools",
       "description": "Latest version"
-    },
-    {
-      "url": "https://badgen.net/badge/icon/kofi?icon=kofi&label=Pizza!&color=red",
-      "href": "https://ko-fi.com/solidpixel",
-      "description": "Get me a slice of pizza on Ko-fi \u2764\ufe0f"
     }
   ],
   "extensionKind": [

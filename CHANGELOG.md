@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## **1.1.0**
 
+- Remove donation links and the repository funding button.
+
 - Refresh the extension logo and matching monochrome sidebar icon.
 
 - Add scoped API token authentication using VS Code's encrypted secret storage, with commands to save or remove a token. Existing Global API Key and email settings remain supported.

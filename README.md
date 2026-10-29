@@ -110,7 +110,3 @@ The packaging tool `@vscode/vsce` is pinned to 3.9.2 because the published 4.0.0
 - [Report an issue](https://github.com/solid-pixel/vscode-cloudflareDevTools/issues/new)
 - [Cloudflare API](https://developers.cloudflare.com/api/)
 - [LinkedIn](https://www.linkedin.com/in/ap-benassi/)
-
-## I love Pizza 🍕
-
-[![Support on Ko-fi](assets/pizza.png)](https://ko-fi.com/N4N7BY7DX)
