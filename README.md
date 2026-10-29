@@ -10,7 +10,7 @@ A [Visual Studio Code extension](https://marketplace.visualstudio.com/items?item
 - Store a scoped API token in VS Code's encrypted secret storage.
 - Test the connection without changing Cloudflare settings or purging content.
 
-![Development Mode, cache and connection commands in VS Code](assets/commands.png)
+![VS Code confirmations for Development Mode on, off, and cache purge](assets/commands.png)
 
 ## Getting started
 
