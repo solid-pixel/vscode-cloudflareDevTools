@@ -41,7 +41,7 @@ async function verifyPackage(filename = packagePath) {
 		assert.ok(entries.has(required), `Package is missing ${required}`);
 	}
 	const packagedManifest = JSON.parse(entries.get('extension/package.json').toString());
-	const readme = entries.get('extension/README.md').toString();
+	const readme = entries.get('extension/readme.md').toString();
 	for (const [, imagePath] of readme.matchAll(/!\[[^\]]*\]\((assets\/[^)]+)\)/g)) {
 		assert.ok(entries.has(`extension/${imagePath}`), `README image must be packaged: ${imagePath}`);
 	}
