@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## **1.1.0**
 
+- Refresh the extension logo and matching monochrome sidebar icon.
+
 - Add scoped API token authentication using VS Code's encrypted secret storage, with commands to save or remove a token. Existing Global API Key and email settings remain supported.
 - Add a one-time API token migration notice for legacy-key users, with setup actions and a reminder to remove old credentials after testing a token.
 - Replace the old preview and settings images with current screenshots of commands, Zone ID setup, secure token input, and the status bar.
