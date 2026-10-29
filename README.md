@@ -24,7 +24,7 @@ Requires VS Code 1.66 or later.
 4. Open the Command Palette and run **Cloudflare DevTools: Set API Token**. Paste the token into the password input.
 5. Run **Cloudflare DevTools: Test Connection**. A successful check confirms that the extension can read Development Mode for the configured zone. It does not test permission to change settings or purge the cache.
 
-**Zone ID setting** (example value):
+**Zone ID setting**:
 
 ![Zone ID setting in VS Code](assets/settings.png)
 
