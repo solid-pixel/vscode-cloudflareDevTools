@@ -1,38 +1,17 @@
-const vscode = require("vscode");
-// const cf = require('./cloudflare');
-
 class DataProvider {
-
-	constructor() {
-
-		this.CFFolders = [
-			{
-				CFFolder: "Development Mode",
-				icon: "code",
-				
-				CFAction: [{ 
-					name: "Turn On", 
-					command: "cloudflareDevTools.devOn",
-					icon: "check"
-				},{
-					name: "Turn Off",
-					command: "cloudflareDevTools.devOff",
-					icon: "circle-slash"
-				}],
-			},
-			{
-				CFFolder: "Cache",
-				icon: "database",
-				
-				CFAction: [{ 
-					name: "Purge", 
-					command: "cloudflareDevTools.purgeCache",
-					icon: "trash"
-				}],
-			}
+	constructor(vscode) {
+		this.vscode = vscode;
+		this.groups = [
+			{ label: 'Development Mode', icon: 'code', actions: [
+				['Turn On', 'devOn', 'check'], ['Turn Off', 'devOff', 'circle-slash']
+			] },
+			{ label: 'Cache', icon: 'database', actions: [['Purge', 'purgeCache', 'trash']] },
+			{ label: 'Connection', icon: 'plug', actions: [
+				['Test Connection', 'testConnection', 'debug-disconnect'],
+				['Set API Token', 'configureToken', 'key'],
+				['Remove API Token', 'removeToken', 'close']
+			] }
 		];
-		this.CFTreeItems = this.convertCFFoldersToTreeFolders();
-		
 	}
 
 	getTreeItem(element) {
@@ -41,58 +20,19 @@ class DataProvider {
 
 	getChildren(element) {
 		if (element) {
-			return element.getCFActionDetails();
-		} else {
-			return this.CFTreeItems;
-		}
-	}
-
-	convertCFFoldersToTreeFolders() {
-		let folders = [];
-		this.CFFolders.forEach((element) => {
-			let folder = new cloudflareTreeItem(element, vscode.TreeItemCollapsibleState.Expanded);
-			// folder.iconPath = new vscode.ThemeIcon(element.icon, cf.colorOn);
-			folder.iconPath = new vscode.ThemeIcon(element.icon);
-			folders.push(
-				folder
-			);
-		});
-		return folders;
-	}
-}
-class cloudflareTreeItem {
-
-	constructor(CFActionsTree, collapsibleState) {
-		this.CFActionsTree = CFActionsTree;
-		this.label = CFActionsTree.CFFolder;
-		this.collapsibleState = collapsibleState;
-		// this.CFActionDetails = [];
-		this.convertCFActionToTreeItems();
-	}
-
-	convertCFActionToTreeItems() {
-
-			let actions = [];
-			this.CFActionsTree.CFAction.forEach((element) => {
-				let action = new vscode.TreeItem(
-					element.name
-				)
-				action.command = {
-					command: element.command,
-				}
-				action.iconPath = new vscode.ThemeIcon(element.icon);
-				actions.push(
-					action
-				);
+			return element.actions.map(([label, command, icon]) => {
+				const item = new this.vscode.TreeItem(label);
+				item.iconPath = new this.vscode.ThemeIcon(icon);
+				item.command = { command: `cloudflareDevTools.${command}`, title: label };
+				return item;
 			});
-			this.CFActionDetails = actions;
-		
+		}
+		return this.groups.map(group => ({
+			...group,
+			iconPath: new this.vscode.ThemeIcon(group.icon),
+			collapsibleState: this.vscode.TreeItemCollapsibleState.Expanded
+		}));
 	}
-
-	getCFActionDetails() {
-		return this.CFActionDetails;
-	}
-
 }
 
 module.exports = DataProvider;
