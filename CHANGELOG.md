@@ -6,7 +6,7 @@ All notable changes to this project will be documented in this file.
 
 - Add scoped API token authentication using VS Code's encrypted secret storage, with commands to save or remove a token. Existing Global API Key and email settings remain supported.
 - Add a one-time API token migration notice for legacy-key users, with setup actions and a reminder to remove old credentials after testing a token.
-- Replace the old preview and settings images with current screenshots of commands, Zone ID setup, secure token input, and the migration notice.
+- Replace the old preview and settings images with current screenshots of commands, Zone ID setup, secure token input, and the status bar.
 - Add a Test Connection command, clearer setup and permission errors, and status feedback for the configured zone and running actions.
 - Fix background checks restarting after being disabled and prevent overlapping checks. Back off after failures without repeated notifications.
 - Purge the cache automatically only after turning Development Mode on. Cancel pending purges when configuration changes, and keep each action tied to its original zone.

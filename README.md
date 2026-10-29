@@ -38,9 +38,7 @@ The token is stored using VS Code's encrypted secret storage. It is not written 
 
 ### Existing Global API Key users
 
-When a Global API Key is configured and no API token is saved, the extension shows a one-time informational notice with **Setup Guide** and **Set API Token** buttons. Dismissing it keeps your current setup working and stops the notice appearing again in that VS Code profile.
-
-![One-time API token migration notice](assets/migration-notice.png)
+Users with a legacy key and no saved token see a one-time notice with **Setup Guide** and **Set API Token** actions.
 
 The existing `cloudflareDevTools.api.key` and `cloudflareDevTools.api.email` settings remain supported. A saved API token takes precedence over them. After testing your token, you can remove the old key and email from your settings. If a token connection succeeds while an old key is still configured, a one-time reminder offers **Open Settings** so you can remove the old key and email after testing. The extension never removes credentials automatically.
 
