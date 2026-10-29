@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## **1.1.2**
+
+- Point the Marketplace Homepage link to https://alebenassi.com/.
+
 ## **1.1.1**
 
 - Add the author's website and GitHub releases to the README links.
