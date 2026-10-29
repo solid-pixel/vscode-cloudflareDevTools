@@ -9,7 +9,7 @@ async function flush() {
 	for (let index = 0; index < 10; index += 1) { await Promise.resolve(); }
 }
 
-function fixture({ polling = true, autoPurge = true, token = 'stored-token', honorCancellation = true, settings = {} } = {}) {
+function fixture({ polling = true, autoPurge = true, token = 'stored-token', honorCancellation = true, settings = {}, noticeState = new Map() } = {}) {
 	const values = {
 		'api.zoneID': ZONE_A,
 		'api.key': 'legacy-key',
@@ -25,7 +25,8 @@ function fixture({ polling = true, autoPurge = true, token = 'stored-token', hon
 	const disposableObjects = [];
 	const requests = [];
 	const queue = new Map();
-	const messages = { info: [], error: [], log: [] };
+	const messages = { info: [], error: [], log: [], choices: [], links: [], commands: [] };
+	const selections = [];
 	let nextTimer = 0;
 	let now = 0;
 	let input;
@@ -39,6 +40,10 @@ function fixture({ polling = true, autoPurge = true, token = 'stored-token', hon
 	const output = disposable({ appendLine(message) { messages.log.push(message); } });
 	const context = {
 		subscriptions: [],
+		globalState: {
+			get: (key, fallback) => noticeState.has(key) ? noticeState.get(key) : fallback,
+			async update(key, value) { noticeState.set(key, value); }
+		},
 		secrets: {
 			async get() { return token; },
 			async store(_key, value) {
@@ -56,6 +61,8 @@ function fixture({ polling = true, autoPurge = true, token = 'stored-token', hon
 		}
 	};
 	const vscode = {
+		env: { async openExternal(uri) { messages.links.push(uri); } },
+		Uri: { parse: value => value },
 		StatusBarAlignment: { Right: 1 },
 		TreeItemCollapsibleState: { Expanded: 2 },
 		ThemeColor: class { constructor(id) { this.id = id; } },
@@ -65,7 +72,7 @@ function fixture({ polling = true, autoPurge = true, token = 'stored-token', hon
 			createStatusBarItem: () => status,
 			createOutputChannel: () => output,
 			createTreeView: () => disposable(),
-			async showInformationMessage(message) { messages.info.push(message); },
+			async showInformationMessage(message, ...choices) { messages.info.push(message); messages.choices.push(choices); return selections.shift(); },
 			async showErrorMessage(message) { messages.error.push(message); },
 			async showInputBox() { return input; }
 		},
@@ -81,7 +88,7 @@ function fixture({ polling = true, autoPurge = true, token = 'stored-token', hon
 				commands.set(name, handler);
 				return disposable({}, () => commands.delete(name));
 			},
-			async executeCommand() {}
+			async executeCommand(...args) { messages.commands.push(args); }
 		}
 	};
 	const client = {
@@ -118,7 +125,7 @@ function fixture({ polling = true, autoPurge = true, token = 'stored-token', hon
 	};
 	const controller = createController(vscode, context, client, timers);
 	return {
-		controller, context, values, status, output, messages, requests, queue, disposableObjects, configListeners, secretListeners,
+		controller, context, values, status, output, messages, requests, queue, disposableObjects, configListeners, secretListeners, noticeState, selections,
 		get clientDisposed() { return clientDisposed; },
 		set input(value) { input = value; },
 		run(name) { return commands.get(`cloudflareDevTools.${name}`)(); },
@@ -386,4 +393,105 @@ test('disposal clears delayed purges and a late secret read cannot restart polli
 	await waiting.advance(10000);
 	assert.equal(waiting.requests.length, 0);
 	assert.equal(waiting.queue.size, 0);
+});
+
+test('legacy migration notice appears once and stays dismissed across sessions', async (t) => {
+	const noticeState = new Map();
+	const f = fixture({ polling: false, token: null, noticeState });
+	t.after(() => f.controller.dispose());
+	await f.controller.start();
+	await flush();
+	assert.equal(f.messages.info.length, 1);
+	assert.match(f.messages.info[0], /recommend switching from your Global API Key/);
+	assert.deepEqual(f.messages.choices[0], ['Setup Guide', 'Set API Token']);
+	await f.change({ 'developmentModeStatus.interval': 10 });
+	assert.equal(f.messages.info.length, 1);
+	const next = fixture({ polling: false, token: null, noticeState });
+	t.after(() => next.controller.dispose());
+	await next.controller.start();
+	await flush();
+	assert.equal(next.messages.info.length, 0);
+});
+
+test('migration notice excludes new and token users', async (t) => {
+	for (const options of [
+		{ token: 'saved-token' },
+		{ token: null, settings: { 'api.key': '', 'api.email': '' } }
+	]) {
+		const f = fixture({ polling: false, ...options });
+		t.after(() => f.controller.dispose());
+		await f.controller.start();
+		await flush();
+		assert.equal(f.messages.info.length, 0);
+	}
+});
+
+test('migration notice actions open the setup guide or the secure token input', async (t) => {
+	for (const selection of ['Setup Guide', 'Set API Token']) {
+		const f = fixture({ polling: false, token: null });
+		t.after(() => f.controller.dispose());
+		f.selections.push(selection);
+		f.input = 'replacement-token';
+		await f.controller.start();
+		await flush();
+		if (selection === 'Setup Guide') {
+			assert.deepEqual(f.messages.links, ['https://github.com/solid-pixel/vscode-cloudflareDevTools#getting-started']);
+		} else {
+			assert.equal(await f.context.secrets.get(TOKEN_KEY), 'replacement-token');
+			assert.equal(f.values['api.key'], 'legacy-key');
+		}
+	}
+});
+
+test('token cleanup reminder appears once after a successful connection with a legacy key still present', async (t) => {
+	const f = fixture({ polling: false });
+	t.after(() => f.controller.dispose());
+	await f.controller.start();
+	f.selections.push(undefined, 'Open Settings');
+	let done = f.run('testConnection');
+	f.requests[0].resolve({ value: 'off' });
+	await done;
+	await flush();
+	assert.match(f.messages.info[1], /remove the old Global API Key and email/);
+	assert.deepEqual(f.messages.commands, [['workbench.action.openSettings', '@ext:AlessandroBenassi.cloudflare-devtools']]);
+	assert.equal(f.values['api.key'], 'legacy-key');
+	done = f.run('testConnection');
+	f.requests[1].resolve({ value: 'off' });
+	await done;
+	await flush();
+	assert.equal(f.messages.info.filter(message => /remove the old Global API Key and email/.test(message)).length, 1);
+});
+
+test('failed token connection does not prompt users to remove legacy credentials', async (t) => {
+	const f = fixture({ polling: false });
+	t.after(() => f.controller.dispose());
+	await f.controller.start();
+	const done = f.run('testConnection');
+	f.requests[0].reject(new Error('Permission denied'));
+	await done;
+	assert.equal(f.messages.info.length, 0);
+	assert.equal(f.values['api.key'], 'legacy-key');
+});
+
+test('disposal while persisting a notice prevents late UI actions', async () => {
+	const f = fixture({ polling: false, token: null });
+	let save;
+	f.context.globalState.update = () => new Promise(resolve => { save = resolve; });
+	await f.controller.start();
+	f.controller.dispose();
+	save();
+	await flush();
+	assert.equal(f.messages.info.length, 0);
+});
+
+test('pending migration notice is suppressed if a token is saved before it displays', async (t) => {
+	const f = fixture({ polling: false, token: null });
+	t.after(() => f.controller.dispose());
+	let save;
+	f.context.globalState.update = () => new Promise(resolve => { save = resolve; });
+	await f.controller.start();
+	await f.changeToken('new-token');
+	save();
+	await flush();
+	assert.equal(f.messages.info.length, 0);
 });

@@ -41,6 +41,10 @@ async function verifyPackage(filename = packagePath) {
 		assert.ok(entries.has(required), `Package is missing ${required}`);
 	}
 	const packagedManifest = JSON.parse(entries.get('extension/package.json').toString());
+	const readme = entries.get('extension/README.md').toString();
+	for (const [, imagePath] of readme.matchAll(/!\[[^\]]*\]\((assets\/[^)]+)\)/g)) {
+		assert.ok(entries.has(`extension/${imagePath}`), `README image must be packaged: ${imagePath}`);
+	}
 	assert.equal(packagedManifest.version, manifest.version, 'Package version must match the source');
 	assert.equal(packagedManifest.publisher, manifest.publisher, 'Package publisher must match the source');
 	assert.equal(packagedManifest.engines.vscode, manifest.engines.vscode, 'Package compatibility must match the source');

@@ -10,7 +10,7 @@ A [Visual Studio Code extension](https://marketplace.visualstudio.com/items?item
 - Store a scoped API token in VS Code's encrypted secret storage.
 - Test the connection without changing Cloudflare settings or purging content.
 
-![Development Mode and cache commands](assets/preview.gif)
+![Development Mode, cache and connection commands in VS Code](assets/commands.png)
 
 ## Getting started
 
@@ -24,13 +24,27 @@ Requires VS Code 1.66 or later.
 4. Open the Command Palette and run **Cloudflare DevTools: Set API Token**. Paste the token into the password input.
 5. Run **Cloudflare DevTools: Test Connection**. A successful check confirms that the extension can read Development Mode for the configured zone. It does not test permission to change settings or purge the cache.
 
+**Zone ID setting** (example value):
+
+![Zone ID setting in VS Code](assets/settings.png)
+
+**Set API Token** opens a password input:
+
+![Secure API token input in VS Code](assets/token-input.png)
+
 Permission references: [read a zone setting](https://developers.cloudflare.com/api/resources/zones/subresources/settings/methods/get/), [edit a zone setting](https://developers.cloudflare.com/api/resources/zones/subresources/settings/methods/edit/), and [purge cached content](https://developers.cloudflare.com/api/resources/cache/methods/purge/).
 
 The token is stored using VS Code's encrypted secret storage. It is not written to `settings.json` and is not synced between machines. Run **Set API Token** again to replace it, or **Remove API Token** to delete the saved token.
 
 ### Existing Global API Key users
 
-The existing `cloudflareDevTools.api.key` and `cloudflareDevTools.api.email` settings remain supported. A saved API token takes precedence over them. After testing your token, you can remove the old key and email from your settings. Removing a saved token makes the extension fall back to the key and email if they are still configured.
+When a Global API Key is configured and no API token is saved, the extension shows a one-time informational notice with **Setup Guide** and **Set API Token** buttons. Dismissing it keeps your current setup working and stops the notice appearing again in that VS Code profile.
+
+![One-time API token migration notice](assets/migration-notice.png)
+
+The existing `cloudflareDevTools.api.key` and `cloudflareDevTools.api.email` settings remain supported. A saved API token takes precedence over them. After testing your token, you can remove the old key and email from your settings. If a token connection succeeds while an old key is still configured, a one-time reminder offers **Open Settings** so you can remove the old key and email after testing. The extension never removes credentials automatically.
+
+Removing a saved token makes the extension fall back to the key and email if they are still configured.
 
 Cloudflare [recommends API tokens](https://developers.cloudflare.com/fundamentals/api/get-started/), which can be limited to the permissions and zone this extension needs.
 

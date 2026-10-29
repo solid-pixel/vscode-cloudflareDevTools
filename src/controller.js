@@ -2,6 +2,9 @@ const DataProvider = require('./dataProvider');
 
 const TOKEN_KEY = 'cloudflareDevTools.apiToken';
 const PREFIX = 'cloudflareDevTools';
+const MIGRATION_NOTICE_KEY = 'cloudflareDevTools.apiTokenNotice.v1';
+const CLEANUP_NOTICE_KEY = 'cloudflareDevTools.apiTokenCleanupNotice.v1';
+const SETUP_GUIDE = 'https://github.com/solid-pixel/vscode-cloudflareDevTools#getting-started';
 
 function createController(vscode, context, client, timers = { setTimeout, clearTimeout }) {
 	const status = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right);
@@ -19,6 +22,29 @@ function createController(vscode, context, client, timers = { setTimeout, clearT
 	let lastPollError;
 	let lastStatus = 'Connection not tested';
 	let statusError = false;
+	const shownNotices = new Set();
+
+	async function noticeOnce(key, message, ...actions) {
+		if (disposed || shownNotices.has(key) || context.globalState.get(key, false)) { return; }
+		shownNotices.add(key);
+		try {
+			await context.globalState.update(key, true);
+			if (disposed || !settings || !settings.hasLegacyKey) { return; }
+			if (key === MIGRATION_NOTICE_KEY && settings.credentials.token) { return; }
+			if (key === CLEANUP_NOTICE_KEY && !settings.credentials.token) { return; }
+			const selected = await vscode.window.showInformationMessage(message, ...actions);
+			if (disposed) { return; }
+			if (selected === 'Setup Guide') {
+				await vscode.env.openExternal(vscode.Uri.parse(SETUP_GUIDE));
+			} else if (selected === 'Set API Token') {
+				await configureToken();
+			} else if (selected === 'Open Settings') {
+				await vscode.commands.executeCommand('workbench.action.openSettings', '@ext:AlessandroBenassi.cloudflare-devtools');
+			}
+		} catch {
+			log('Could not display the API token setup notice. See the README for setup instructions.');
+		}
+	}
 
 	function log(message) {
 		if (!disposed) { output.appendLine(`[${new Date().toLocaleTimeString()}] ${message}`); }
@@ -153,6 +179,7 @@ function createController(vscode, context, client, timers = { setTimeout, clearT
 				revision,
 				zoneId: text('api.zoneID'),
 				credentials: Object.freeze(token ? { token } : { key: text('api.key'), email: text('api.email') }),
+				hasLegacyKey: Boolean(text('api.key')),
 				polling: config.get('developmentModeStatus.enable', true) === true,
 				interval: Math.min(86400, Math.max(5, Number.isFinite(seconds) ? seconds : 60)) * 1000,
 				autoPurge: config.get('cache.purgeAutomatically', true) === true
@@ -161,6 +188,11 @@ function createController(vscode, context, client, timers = { setTimeout, clearT
 			lastPollError = undefined;
 			lastStatus = configurationError(settings) || (settings.polling ? 'Checking connection' : 'Periodic status checks disabled');
 			render();
+			if (!token && settings.hasLegacyKey) {
+				void noticeOnce(MIGRATION_NOTICE_KEY,
+					'Cloudflare DevTools now supports scoped API tokens stored securely by VS Code. We recommend switching from your Global API Key. Your existing setup continues to work.',
+					'Setup Guide', 'Set API Token');
+			}
 			if (!configurationError(settings) && settings.polling) { void poll(settings); }
 		} catch {
 			if (disposed || refreshRevision !== revision) { return; }
@@ -215,6 +247,11 @@ function createController(vscode, context, client, timers = { setTimeout, clearT
 					: `Development Mode is ${result.value.toUpperCase()} for zone ${snapshot.zoneId}.`;
 			log(message);
 			void vscode.window.showInformationMessage(message);
+			if (kind === 'test' && snapshot.credentials.token && snapshot.hasLegacyKey) {
+				void noticeOnce(CLEANUP_NOTICE_KEY,
+					'Your API token connected successfully. Once you have finished testing, remove the old Global API Key and email from Cloudflare DevTools settings.',
+					'Open Settings');
+			}
 			if (kind === 'on' && result.value === 'on' && snapshot.autoPurge) { schedulePurge(snapshot); }
 		} catch (error) {
 			if (!current(snapshot) || error.code === 'CANCELLED') { return; }
