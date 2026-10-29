@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## **1.1.1**
+
+- Add the author's website and GitHub releases to the README links.
+
 ## **1.1.0**
 
 - Remove donation links and the repository funding button.
