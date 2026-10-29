@@ -61,7 +61,9 @@ Open commands through the **Cloudflare DevTools** sidebar, the cloud icon in the
 | Remove API Token | Delete the saved API token. |
 | Test Connection | Read the zone's Development Mode status without changing it. |
 
-The status bar shows when an action is running. Its tooltip identifies the configured zone and reports the current status. Development Mode expires automatically after three hours; the tooltip shows the remaining time when Cloudflare provides it.
+The cloud icon in the status bar opens the extension’s commands. It is highlighted while Development Mode is on and shows a spinner while an action is running. Its tooltip identifies the configured zone and reports the current status. Development Mode expires automatically after three hours; the tooltip shows the remaining time when Cloudflare provides it.
+
+![Cloud icon highlighted in the VS Code status bar while Development Mode is on](assets/status-bar.png)
 
 Automatic cache purging runs only after successfully turning Development Mode **on**. Turning it off does not purge the cache. Changing the configuration cancels a pending automatic purge, so it cannot move to another zone.
 
