@@ -100,7 +100,9 @@ npm run package
 
 `npm run package` builds and inspects `dist/cloudflare-devtools-1.1.2.vsix`. CI checks the supported VS Code baseline and the current release, audits dependencies, and validates the package. Packaging does not publish a release. Dependabot checks npm packages and GitHub Actions weekly, grouping compatible minor and patch updates.
 
-The packaging tool `@vscode/vsce` is pinned to 3.9.2 because the published 4.0.0 package was missing its runtime files when checked. A scoped `@azure/msal-node` override updates a dependency affected by [GHSA-xcx6-jx8p-x3h5](https://github.com/advisories/GHSA-xcx6-jx8p-x3h5). Review these temporary constraints when updating the packaging tool.
+The packaging tool `@vscode/vsce` remains pinned to 3.9.2 on this branch. The published 4.0.0 package was missing its runtime files when checked; the upgrade to 4.1.0 is tracked separately. A scoped override uses `glob` 14.0.3 under VSCE to address [GHSA-3g3m-2fjr-6pw4](https://github.com/advisories/GHSA-3g3m-2fjr-6pw4). This also makes its file traversal compatible with `minimatch` 11.
+
+Scoped overrides use `minimatch` 11.0.4 for ESLint, its configuration loader and VSCE to address [GHSA-g3hv-75wg-m249](https://github.com/advisories/GHSA-g3hv-75wg-m249). A scoped `@azure/msal-node` override addresses [GHSA-xcx6-jx8p-x3h5](https://github.com/advisories/GHSA-xcx6-jx8p-x3h5). Review these temporary overrides when their parent packages adopt patched dependencies; run the audit, lint, tests and package checks before removing them.
 
 ## Links and feedback
 

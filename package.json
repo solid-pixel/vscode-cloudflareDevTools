@@ -167,13 +167,21 @@
     "@eslint/js": "^10.0.1",
     "@vscode/test-electron": "^3.1.0",
     "@vscode/vsce": "3.9.2",
-    "eslint": "^10.13.0",
+    "eslint": "^10.14.0",
     "globals": "^17.13.0",
     "yauzl": "^3.4.0"
   },
   "overrides": {
     "@vscode/vsce": {
-      "@azure/msal-node": "^7.1.2"
+      "@azure/msal-node": "^7.1.2",
+      "minimatch": "11.0.4",
+      "glob": "14.0.3"
+    },
+    "eslint": {
+      "minimatch": "11.0.4"
+    },
+    "@eslint/config-array": {
+      "minimatch": "11.0.4"
     }
   }
 }
